@@ -1,0 +1,91 @@
+import especies.*
+import reservaNatural.*
+
+describe "Test Especies"{
+
+	const desierto = new Habitat(seresVivos = [])
+	const bosque = new Habitat(seresVivos = [])
+	const llanura = new Habitat(seresVivos = [])
+			
+	const pez=new EspecieFauna(pesoReferencia=50, coeficiente=10,locomocion=nadar)
+	const mamifero=new EspecieFauna(pesoReferencia=50, coeficiente=30,locomocion=correr)
+	const ave = new EspecieFauna(pesoReferencia = 20, coeficiente = 4, locomocion = volar)
+	const cnidario = new EspecieFauna(pesoReferencia = 10, coeficiente = 1, locomocion = quedarseQuieto)
+			
+	const palmera = new EspecieFlora(alturaReferencia = 200)
+	const helecho = new EspecieFlora(alturaReferencia = 5)
+			
+	const gaviota = new Animal(peso = 15, especie = ave, habitat = desierto)
+	const coral = new Animal(especie = cnidario, peso = 8, habitat = bosque)
+	const condor = new Animal(especie = ave, peso = 60, habitat = llanura)
+	const merluza = new Animal(peso=20,especie=pez,habitat=bosque)
+	const zorro = new Animal(peso=25,especie=mamifero,habitat=llanura)
+	const loro = new Animal(especie = ave, peso = 2, habitat = bosque)
+			
+	const palmeraReal = new Planta(altura = 300, especie = palmera, habitat = desierto)
+	const nidoDeAve = new Planta(altura = 2, especie = helecho, habitat = bosque)
+			
+	
+	method initialize(){
+		reserva.agregarHabitat(desierto)
+		reserva.agregarHabitat(llanura)
+		reserva.agregarHabitat(bosque)
+		llanura.agregarSerVivo(condor)
+		llanura.agregarSerVivo(zorro)
+		bosque.agregarSerVivo(coral)
+		desierto.agregarSerVivo(gaviota)
+		desierto.agregarSerVivo(palmeraReal)
+		bosque.agregarSerVivo(nidoDeAve)
+		bosque.agregarSerVivo(merluza)
+		bosque.agregarSerVivo(loro)
+		
+	}
+	
+	test "Habitat con mayor biomasa, el bosque" {
+		assert.equals(llanura,reserva.esConMayorBiomasa())
+	}
+	
+	test "Cantidad total de biomasa en la reserva: 1286.08" {
+		assert.equals(1286.08333,reserva.cantTotalBiomasa())
+	}
+	
+	test "El desierto no está equilibrado" {
+		assert.notThat(desierto.estaEquilibrado())
+	}
+	
+	test "El bosque está equilibrado" {
+		assert.that(bosque.estaEquilibrado())
+	}
+	
+	test "La llanura no está equilibrada" {
+		assert.notThat(llanura.estaEquilibrado())
+	}
+	
+	test "El desierto y la llanura no están en equilibrio" {
+		assert.equals([desierto, llanura], reserva.cualesNoEstanEquilibrados())
+	}
+	
+	test "La especie ave esta en todos los habitats"{	
+		assert.that(ave.estaEnTodosLosHabitats())
+	}
+	
+	test "Se incendia el desierto. La palmera disminuye su tamaño a 60" {
+		desierto.seIncendia()
+		assert.equals(295, palmeraReal.altura())
+		assert.equals([palmeraReal], desierto.seresVivos())	
+	}
+	
+	test "Se incendia el bosque. El nido de ave, el coral y el loro no se salvan, la merluza si" {
+		bosque.seIncendia()
+		assert.equals(18, merluza.peso())
+		assert.equals([merluza], bosque.seresVivos())	
+	}
+	
+	test "Se incendia la llanura. El condor y el zorro se salvan" {
+		llanura.seIncendia()
+		assert.equals(54, condor.peso())
+		assert.equals(22.5, zorro.peso())
+		assert.equals([condor, zorro], llanura.seresVivos())	
+	}
+	
+}

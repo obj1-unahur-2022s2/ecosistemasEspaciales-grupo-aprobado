@@ -1,0 +1,122 @@
+import especies.*
+import reservaNatural.*
+
+describe "Test Especie flora"{
+
+		const jungla = new Habitat(seresVivos = []) 
+	
+		const arbol = new EspecieFlora(alturaReferencia = 15)
+		
+		const caoba = new Planta(altura = 60, especie = arbol, habitat = jungla)
+		const platano = new Planta(altura = 5, especie = arbol, habitat = jungla)
+
+			
+	
+	method initialize(){
+		reserva.agregarHabitat(jungla)
+		jungla.agregarSerVivo(platano)
+		jungla.agregarSerVivo(caoba)
+	}
+	
+	test "El caoba tiene una biomasa de 60 kg y es grande" {
+		assert.equals(15, caoba.cantBiomasa())
+		assert.that(caoba.esGrande())
+	}
+	
+	test "El platano tiene una biomasa de 60 kg y es pequeño" {
+		assert.equals(10, platano.cantBiomasa())
+		assert.that(platano.esPequenio())
+	}
+	
+	test "La especie arbol tiene una altura de referencia de 15 mts" {
+		assert.equals(15,arbol.alturaReferencia())
+	}
+	
+	test "El caoba y el platano pertenecen a la especie arbol" {
+		assert.equals(arbol,caoba.especie())
+		assert.equals(arbol,platano.especie())
+	}
+	
+	test "El caoba y el platano se encuentran en el habitat de la jungla" {
+		assert.equals(jungla,caoba.habitat())
+		assert.equals(jungla,platano.habitat())
+	}
+	
+	test "El caoba es grande, se quema y su altura disminuye a 55. Se salva." {
+		caoba.seQuema()
+		assert.equals(55,caoba.altura())
+		assert.equals([platano, caoba],jungla.seresVivos())
+	}
+	
+	test "El plátano es pequeño, se quema y no se salva." {
+		platano.seQuema()
+		assert.equals([caoba],jungla.seresVivos())
+	}
+}
+
+describe "Test Especie fauna"{
+		
+		const jungla = new Habitat(seresVivos = []) 
+		
+		const ave = new EspecieFauna(pesoReferencia = 20, coeficiente = 4, locomocion = volar)
+		const simio = new EspecieFauna(pesoReferencia = 30, coeficiente = 10, locomocion = correr)
+		const lagarto = new EspecieFauna(pesoReferencia = 3, coeficiente = 8, locomocion = quedarseQuieto)
+		const pez = new EspecieFauna(pesoReferencia = 15, coeficiente = 2, locomocion = nadar)
+		
+		const monoCapuchino = new Animal(peso = 5, especie = simio, habitat = jungla)
+		const tucan = new Animal(peso = 10, especie = ave, habitat = jungla)
+		const mandril = new Animal(peso = 31, especie = simio, habitat = jungla)
+		const pirania = new Animal(peso = 1, especie = pez, habitat = jungla)
+		const camaleon = new Animal(peso = 2, especie = lagarto, habitat = jungla)
+			
+	
+	method initialize(){
+		reserva.agregarHabitat(jungla)
+		jungla.agregarSerVivo(tucan)
+		jungla.agregarSerVivo(mandril)
+		jungla.agregarSerVivo(monoCapuchino)
+		jungla.agregarSerVivo(pirania)
+		jungla.agregarSerVivo(camaleon)
+	}
+	
+	test "El mono Capuchino pesa 15 kg, es de la especie simio y su habitat es la jungla" {
+		assert.equals(5, monoCapuchino.peso())
+		assert.equals(simio, monoCapuchino.especie())
+		assert.equals(jungla, monoCapuchino.habitat())
+	}
+		
+	test "El tucan tiene una biomasa de 25 y es de tamaño mediano" {
+		assert.equals(25,tucan.cantBiomasa())
+		assert.that(tucan.esMediano())
+	}
+		
+	test "El mandril no es pequeño, es grande" {
+		assert.notThat(mandril.esPequenio())
+		assert.that(mandril.esMediano())
+	}
+		
+	test "El tucan y el camaleon se queman y no sobreviven" {
+		tucan.seQuema()
+		camaleon.seQuema()
+		assert.notThat(volar.seSalva(tucan))
+		assert.notThat(quedarseQuieto.seSalva(camaleon))
+		assert.equals([mandril, monoCapuchino, pirania],jungla.seresVivos())
+	}
+		
+	test "El mandril y la piraña se queman pero sobreviven. El peso disminuye a 27.9 el mandril y 0.9
+	la piraña" {
+		mandril.seQuema()
+		pirania.seQuema()
+		assert.that(correr.seSalva(mandril))
+		assert.that(nadar.seSalva(pirania))
+		assert.equals(27.9,mandril.peso())
+		assert.equals(0.9,pirania.peso())
+		assert.equals([tucan, mandril, monoCapuchino, pirania, camaleon],jungla.seresVivos())
+	}
+	
+	test "El mono capuchino se quema y no sobrevive" {
+		monoCapuchino.seQuema()
+		assert.notThat(correr.seSalva(monoCapuchino))
+		assert.equals([tucan, mandril, pirania, camaleon],jungla.seresVivos())
+	}
+}
